@@ -1,0 +1,135 @@
+# Replication = 1
+```{r}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+# 清空工作环境
+rm(list = ls())
+
+# Params
+nGenos <- c(1000, 500, 250)   
+nEnvs <- c(1, 2, 3, 4, 5)     
+nFounders <- 20                
+nChr <- 21                     
+nSegSites <- 300               
+mu <- 4                       
+sigma2 <- 0.2               
+H2 <- 0.3                     
+sigma2e <- sigma2 / H2 - sigma2 
+
+# Founders
+founders <- runMacs(nInd = nFounders, nChr = nChr, segSites = nSegSites, inbred = TRUE, species = "WHEAT", nThreads = 2)
+
+# Sim Params
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nSegSites, mean = mu, var = sigma2)
+founders <- newPop(founders)
+
+# F1 genos & DHs
+f1s <- randCross(pop = founders, nCrosses = 20, nProgeny = 5)
+DHs <- makeDH(pop = f1s, nDH = 1)
+
+# Iterate over each environment configuration
+for (env_count in nEnvs) {
+  # Count rows and columns for each env
+  total_plots <- 2000 / env_count
+  nrows <- ceiling(sqrt(total_plots))
+  ncols <- ceiling(total_plots / nrows)
+
+  # field_trial_error parameters
+  error_df <- field_trial_error(
+    ntraits = 1,
+    nenvs = env_count,
+    nblocks = 1,
+    block.dir = "row",
+    ncols = ncols,
+    nrows = nrows,
+    varR = sigma2e,
+    spatial.model = "AR1",
+    col.cor = 0.5,
+    row.cor = 0.7,
+    prop.spatial = 0.4,
+    ext.ord = "random",
+    ext.dir = "both",
+    prop.ext = 0.2,
+    return.effects = TRUE
+  )
+
+  # print out
+  cat(sprintf("No. of Envs：%d, Rows：%d, Columns：%d, Total No. of Blocks：%d\n", env_count, nrows, ncols, nrows * ncols))
+  plot_effects(error_df$Trait1[error_df$Trait1$env == 1,], effect = "e.spat")
+} 
+
+
+```
+
+# Replication = 0~3
+```{r}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+
+rm(list = ls())
+
+# Params
+nGenos <- c(1000, 500, 250)
+nEnvs <- c(1, 2, 3, 4, 5)      
+nFounders <- 20                
+nChr <- 21                     
+nSegSites <- 300              
+mu <- 4                        
+sigma2 <- 0.2                 
+H2 <- 0.3                     
+sigma2e <- sigma2 / H2 - sigma2
+
+# Founder
+founders <- runMacs(nInd = nFounders, nChr = nChr, segSites = nSegSites, inbred = TRUE, species = "WHEAT", nThreads = 2)
+
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nSegSites, mean = mu, var = sigma2)
+founders <- newPop(founders)
+
+# F1 and DH
+f1s <- randCross(pop = founders, nCrosses = 20, nProgeny = 5)
+DHs <- makeDH(pop = f1s, nDH = 1)
+
+# for each env
+for (env_count in nEnvs) {
+  # cal no. of row and col
+  total_plots <- 2000 / env_count
+  nrows <- ceiling(sqrt(total_plots))
+  ncols <- ceiling(total_plots / nrows)
+  
+  # replicated by 0~3
+  rep_matrix <- matrix(sample(1:3, nrows * ncols, replace = TRUE), nrow = nrows, ncol = ncols)
+  num_replications <- sum(rep_matrix)  # total reps
+
+  error_df <- field_trial_error(
+    ntraits = 1,
+    nenvs = env_count,
+    nblocks = rep_matrix,  # replication matrix
+    block.dir = "row",
+    ncols = ncols,
+    nrows = nrows,
+    varR = rep(sigma2e, num_replications),
+    spatial.model = "AR1",
+    col.cor = 0.5,
+    row.cor = 0.7,
+    prop.spatial = 0.4,
+    ext.ord = "random",
+    ext.dir = "both",
+    prop.ext = 0.2,
+    return.effects = TRUE
+  )
+
+  # design matrix
+  cat(sprintf("n_env：%d, n_row：%d, n_col：%d, n_blocks：%d, reps：%d\n", env_count, nrows, ncols, nrows * ncols, num_replications))
+
+  # visualise
+  plot_effects(error_df$Trait1[error_df$Trait1$env == 1,], effect = "e.spat")
+}
+
+```
+

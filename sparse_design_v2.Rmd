@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+# 清空工作环境
+rm(list = ls())
+
+# Params
+nGenos <- 1000  # 基因型数量
+nEnvs <- c(1, 2, 3, 4, 5)  # 环境数量
+nFounders <- 20
+nChr <- 21
+nSegSites <- 300
+mu <- 4
+sigma2 <- 0.2
+H2 <- 0.3
+sigma2e <- sigma2 / H2 - sigma2
+
+# Founders
+founders <- runMacs(nInd = nFounders, nChr = nChr, segSites = nSegSites, inbred = TRUE, species = "WHEAT", nThreads = 2)
+
+# Sim Params
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nSegSites, mean = mu, var = sigma2)
+founders <- newPop(founders)
+
+# F1 genos & DHs
+f1s <- randCross(pop = founders, nCrosses = 40, nProgeny = 25)
+DHs <- makeDH(pop = f1s, nDH = 1)
+
+# Iterate over each environment configuration
+for (env_count in nEnvs) {
+  total_plots <- 2000
+  ncols <- 40
+  nrows <- ceiling(nGenos / env_count)  # 分配基因型到每个环境
+
+  # 创建种植矩阵
+  planting_matrix <- matrix(0, nrow = nrows, ncol = ncols)
+  for (i in 1:nGenos) {
+    allocated_envs <- sample(nEnvs, env_count, replace = FALSE)  # 随机选择环境
+    for (env in allocated_envs) {
+      planting_matrix[i, env] <- 1  # 在选中的环境种植基因型
+    }
+  }
+
+  # 模拟试验
+  error_df <- field_trial_error(
+    ntraits = 1,
+    nenvs = env_count,
+    nblocks = 1,  # 假设每个环境只有一个区块
+    block.dir = "col",
+    ncols = ncols,
+    nrows = nrows,
+    varR = sigma2e,
+    spatial.model = "AR1",
+    col.cor = 0.5,
+    row.cor = 0.7,
+    prop.spatial = 0.5,
+    return.effects = TRUE
+  )
+
+  # 输出信息
+  cat(sprintf("No. of Envs：%d, Columns：%d, Rows：%d, Total No. of Plots：%d\n", env_count, nrows, ncols, nrows * ncols))
+}
+
+```
+
+

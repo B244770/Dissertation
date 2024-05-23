@@ -1,0 +1,93 @@
+---
+title: "sparse_design_v2"
+author: "Sean"
+date: "2024-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+rm(list = ls())
+
+# 参数设置
+nGenos <- c(1000, 500, 250)
+nEnvs <- c(1, 2, 3, 4, 5)      
+nFounders <- 20
+nChr <- 21
+nSegSites <- 300
+mu <- 4
+sigma2 <- 0.2
+H2 <- 0.3
+sigma2e <- sigma2 / H2 - sigma2
+
+# 创始种群
+founders <- runMacs(nInd = nFounders, nChr = nChr, segSites = nSegSites, inbred = TRUE, species = "WHEAT", nThreads = 2)
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nSegSites, mean = mu, var = sigma2)
+founders <- newPop(founders)
+
+# F1 and DH
+f1s <- randCross(pop = founders, nCrosses = 40, nProgeny = 25)
+DHs <- makeDH(pop = f1s, nDH = 1)
+
+# 网格搜索参数
+nrows_options <- c(10, 20, 30)
+ncols_options <- c(10, 20, 30)
+rep_options <- c(1, 2, 3)
+
+# 存储结果
+results <- list()
+
+# 评估函数，根据模拟的数据计算准确性
+evaluate_design <- function(planting_matrix, nrows, ncols, reps) {
+    # 这里应使用模拟数据来评估模型的准确性
+    simulated_data <- matrix(rnorm(nrows * ncols, mean = mu, sd = sqrt(sigma2)), nrows, ncols)
+    mean_effect <- mean(simulated_data)  # 计算平均效应
+    specific_effect <- simulated_data[1,1]  # 假设取第一个作为特定环境效应的示例
+    accuracy <- cor(mean_effect, specific_effect)  # 计算准确性
+    return(accuracy)
+}
+
+# 网格搜索
+for (nrows in nrows_options) {
+    for (ncols in ncols_options) {
+        for (reps in rep_options) {
+            planting_matrix <- matrix(sample(c(rep(1, reps), rep(0, nrows*ncols - reps)), nrows*ncols, replace = FALSE), nrow = nrows, ncol = ncols)
+            score <- evaluate_design(planting_matrix, nrows, ncols, reps)
+            results[[paste(nrows, ncols, reps)]] <- list(score = score, matrix = planting_matrix)
+        }
+    }
+}
+
+# 找到最佳配置
+scores <- sapply(results, function(x) x$score)  # 提取所有评分
+best_index <- which.max(scores)  # 找到最高分的索引
+best_score <- scores[best_index]  # 最高分
+best_settings <- names(scores)[best_index]  # 最佳配置的键
+
+print(paste("Best score: ", best_score))
+print(paste("Best configuration: ", best_settings))
+
+# 打印和检查
+print("Available keys in results:")
+print(names(results))  # 打印可用键
+
+# 检查是否存在
+if (best_settings %in% names(results)) {
+  print("Best planting matrix:")
+  print(results[[best_settings]]$matrix)  # 展示最佳种植矩阵
+} else {
+  print("Error: Invalid key for results.")
+}
+
+
+```

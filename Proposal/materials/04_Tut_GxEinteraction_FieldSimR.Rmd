@@ -1,0 +1,551 @@
+---
+title: "Simulating a multi-environment trial (MET) dataset - FieldSimR demonstration"
+author: "D.J. Tolhurst and C.R. Werner"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{Simulating a multi-environment trial (MET) dataset - FieldSimR demonstration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+<br/>
+
+The objective of this tutorial is to simulate a MET dataset using FieldSimR which captures GxE interaction and spatial variation with realistic structure and complexity. Genetic values will be simulated using AlphaSimR based on an additive genetic trait representing grain yield.
+
+<br/>
+
+<div class="warning" style='background-colour: rgba(0,0,0,0.07); colour: #000000; border-left: solid #000080 4px; border-right: solid #000080 4px; border-top: solid #000080 4px; border-bottom: solid #000080 4px; border-radius: 7px; padding:0.7em;'>
+<span>
+<p style='margin-top:0.5em; margin-left:0.5em; text-align:left; font-size:25px'>
+**Summary** </b></p>
+<p style='margin-left:1em;'>
+The simulation can be summarised by the following steps:
+</p>
+1.  Simulating genetic values with AlphaSimR
+    a. Simulation parameters
+    b. FieldSimR's wrapper functions for simulating GxE interaction
+        - Measures of variance explained
+</p>
+2.  Simulating plot errors with FieldSimR
+    a. Simulation parameters
+    b. `field_trial_error()` and `plot_effects()` functions
+    
+</p>
+3.  Generating phenotypes by combining the plot errors with the genetic values
+    a.  `make_phenotypes()` function
+        - Measures of heritability and expected accuracy
+</p>
+<p style='margin-bottom:1.5em;'>
+</p></span>
+</div>
+
+<br/>
+
+### **Preliminaries**
+
+Clean the working environment.
+
+```{r}
+rm(list = ls())
+```
+
+Install FieldSimR from github.
+
+```{r, eval = FALSE}
+library(devtools)
+install_github("crWerner/fieldsimr")
+```
+
+Load required packages.
+
+```{r}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+library(mbend)
+```
+
+The results in this tutorial can be reproduced by initially setting the following seed.
+
+```{r}
+set.seed(123)
+```
+
+<br/>
+
+### **Simulation details**
+
+Consider a scenario in which 200 inbred wheat genotypes are evaluated for grain yield (t/ha) in field trials across 10 growing environments. The genotypes are simulated with additive genetic relatedness using AlphaSimR. Each trial comprises 20 columns and 20 rows for 400 plots in total, with two complete blocks of all genotypes aligned in the column direction (side-by-side). The overall trait mean is 4 t/ha and the overall trait variance is 0.2 t<sup>2</sup>/ha<sup>2</sup>. The average plot-level heritability is 0.3, which reflects the average ratio of genetic variance to total phenotypic variance within environments. The error variance is given by 0.2/0.3-0.2 = 0.47 t<sup>2</sup>/ha<sup>2</sup>.
+
+<br/> The simulation parameters are:
+
+```{r}
+ngenos <- 200 # no. genotypes
+nenvs <- 10   # no. environments
+nreps <- nblocks <- 2 # no. replicates/blocks per environment
+block_dir <- "col" # block direction
+ncols <- 20   # no. columns per environment
+nrows <- 20   # no. rows per environment
+nplots <- ncols * nrows # no. plots per environment == ngenos * nreps
+mu <- 4        # overall trait mean
+sigma2 <- 0.2  # overall trait variance 
+H2 <- 0.3      # average plot-level heritability
+sigma2e <- sigma2/H2 - sigma2 # error variance
+round(sigma2e, digits = 2)
+```
+
+<br/> 
+
+The field trial layout for environment 1 is:
+
+```{r, echo = FALSE, fig.width = 10, fig.height = 3.5}
+layout_df <- data.frame(block = factor(rep(1:2, each = nplots/2)),
+                        col = factor(rep(1:ncols, each = nrows)),
+                        row = factor(1:nrows),
+                        plot = factor(1:nplots))
+FieldSimR::plot_effects(layout_df, effect = "block")
+```
+
+<br/>
+
+The phenotypes are generated based on the linear mixed model:
+
+$\mathbf{y} = \mathbf{Z}\mathbf{gv} + \mathbf{e}$,
+
+where $\mathbf{gv}$ is a vector of genetic values with design matrix $\mathbf{Z}$ 
+and $\mathbf{e}$ is a vector of plot errors. The inclusion of additional non-genetic effects is straightforward.
+
+The simulation involves three steps:
+
+1.  Simulating the genetic values with AlphaSimR, using FieldSimR's wrapper functions
+2.  Simulating the plot errors with FieldSimR
+3.  Generating the phenotypes by combining the genetic values with the non-genetic effects and plot errors. 
+
+<br/>
+
+
+### **1. Simulating the genetic values with AlphaSimR**
+
+The genetic values are simulated to capture GxE interaction, which can be broadly categorised as either heterogeneity of genetic variance (changes in genotype scale) or lack of genetic correlation (changes in genotype rank).
+
+Simulating the genetic values involves two parts:
+
+a. Setting the simulation parameters for the founder population and trait architecture 
+b. Simulating an additive genetic trait using FieldSimR's wrapper functions for GxE interaction. 
+
+FieldSimR provides wrapper functions for compound symmetry and unstructured models for GxE interaction.
+
+<br/>
+
+#### **a. Setting the simulation parameters**
+
+The number of homogeneous genotypes in the founder population is set to 20, the number of chromosomes is set to 20 and the number of segregating sites (biallelic QTN) per chromosome is set to 300. 
+
+```{r}
+nfounders <- 20 # Number of genotypes in the founder population.
+nchr <- 21 # Number of chromosomes.
+nseg_sites <- 300 # Number of QTN per chromosome.
+```
+
+<br/>
+
+The overall trait mean and variance are:
+
+```{r}
+mu # trait mean
+sigma2 # trait variance
+```
+
+<br/>
+
+#### **b. Simulating an additive genetic trait**
+
+The founder population is simulated using the `runMacs()` function.
+
+```{r}
+# Simulating a founder population using AlphaSimR's "WHEAT" presets to mimic the species' evolutionary history
+founders <- runMacs(nInd = nfounders,
+                    nChr = nchr,
+                    segSites = nseg_sites,
+                    inbred = TRUE,
+                    species = "WHEAT",
+                    nThreads = 2)
+founders # MapPop object
+SP <- SimParam$new(founders)
+```
+
+<br/>
+
+An additive genetic trait representing grain yield is then simulated with AlphaSimR, using FieldSimR's wrapper functions. The functionality will be demonstrated separately for the simulations involving the compound symmetry and unstructured models.
+
+<br/>
+
+##### **Compound symmetry model**
+
+The genetic values for the compound symmetry model are constructed as the sum of two terms:
+
+$\mathbf{gv} = \mathbf{1} \otimes \mathbf{g} + \mathbf{{ge}}$,
+
+where $\mathbf{g}$ is the vector of genotype main effects and $\mathbf{{ge}}$ is the vector of GxE interaction effects. 
+The proportion of main effect variance of the total genetic variance (main effect + interaction variance) is set to 0.5. This allocates half of the overall trait variance to the genotype main effects and half to the GxE interaction effects.
+
+```{r}
+prop_main <- 0.5
+```
+
+<br/>
+
+FieldSimR's wrapper function `compsym_asr_input()` is then used to populate a list of input parameters for AlphaSimR.
+The list contains vectors for the mean and variance of the genotype main effects and interaction effects, as well as the correlation matrix between all effects.
+
+```{r}
+input_asr1 <- compsym_asr_input(ntraits = 1,
+                                nenvs = nenvs,
+                                mean = mu,
+                                var = sigma2,
+                                prop.main = prop_main)
+input_asr1
+```
+
+Note that the overall trait mean is assigned to the genotype main effects.
+
+<br/>
+
+An additive genetic trait representing grain yield is then simulated, which produces 11 columns in the founder population.
+The first column contains the genotype main effects, while the remaining columns contain the GxE interaction effects.
+
+```{r}
+SP$addTraitA(nQtlPerChr = nseg_sites,
+             mean = input_asr1$mean,
+             var = input_asr1$var,
+             corA = input_asr1$corA)
+founders1 <- newPop(founders) # create pop-class object
+head(founders1@gv)
+```
+
+<br/>
+
+The inbred wheat genotypes are generated by randomly crossing the founders using the `randCross()` function, and then made into DH lines using the `makeDH()` function.
+
+```{r}
+f1s <- randCross(pop = founders1, 
+                 nCrosses = 20, # no. crosses
+                 nProgeny = 10) # no. progeny per cross
+DHs <- makeDH(pop = f1s, nDH = 1)
+DHs
+```
+
+<br/>
+
+FieldSimR's wrapper function `compsym_asr_output()` is then used to obtain the genetic values for the DH population. This function constructs the genetic values for each environment as the sum of the genotype main effects and GxE interaction effects. When `return.effects = TRUE`, a list is returned with an additional data frame containing the genotype main effects and GxE interaction effects for each environment.
+
+```{r}
+gv_df1 <- compsym_asr_output(pop = DHs,
+                             ntraits = 1,
+                             nenvs = nenvs,
+                             nreps = nreps,
+                             return.effects = TRUE)
+head(gv_df1$gv.df) # data frame with simulated genetic values
+head(gv_df1$Trait1) # data frame with simulated genotype main effects and GxE interaction effects
+GV <- matrix(gv_df1$gv.df$gv.Trait1, ncol = nenvs)
+round(mean(GV), digits = 2) # overall trait mean in the DH population
+round(var(GV), digits = 2) # simulated between-environment genetic covariance matrix in the DH population
+round(mean(diag(var(GV))), digits = 2) # overall trait variance in the DH population
+```
+<br/>
+
+##### **Unstructured model**
+
+The genetic values for the unstructured model are simulated as:
+
+$\mathbf{gv} \sim \mbox{N}(\mu\mathbf{1}, \mathbf{G_e} \otimes \mathbf{I})$,
+
+where $\mu$ is the overall trait mean and $\mathbf{G_e}$ is the between-environment genetic covariance matrix, which is constructed as:
+
+$\mathbf{G_e} = \mathbf{D}^{1/2}_\mathbf{e}\mathbf{C_e}\mathbf{D}^{1/2}_\mathbf{e}$
+
+where $\mathbf{D_e}$ is a diagonal genetic variance matrix and $\mathbf{C_e}$ is a between-environment genetic correlation matrix.
+
+The genetic variances are sampled from an inverse gamma distribution, with shape parameter of 5 and scale parameter of 0.8. The genetic variances are then shifted to give an overall trait variance of 0.2.
+
+```{r}
+de <- 1/rgamma(nenvs, shape = 5, rate = 0.8) # sample
+de <- c(scale(de, center = TRUE, scale = FALSE) + sigma2) # shift
+round(de, digits = 2)
+mean(de) # overall trait variance
+De <- diag(de)
+```
+
+<br/>
+
+The genetic correlations are sampled from a continuous uniform distribution ranging from 0.3 to 0.7, which produces a mean genetic correlation of 0.5. This is achieved using FieldSimR's function `rand_cor_mat()`. When `pos.def = TRUE`, the correlation matrix is bent to ensure it is positive definite.
+
+```{r}
+Ce <- rand_cor_mat(n = nenvs, min.cor = 0.3, max.cor = 0.7, pos.def = TRUE)
+round(Ce, digits = 2)
+```
+
+```{r, echo = FALSE}
+heatmap(Ce, symm = TRUE, xlab = "Environment", ylab = "Environment")
+```
+
+FieldSimR's wrapper function `unstr_asr_input()` is then used to populate a list of input parameters for AlphaSimR.
+The list contains vectors for the mean and variance of the genetic values in each environment, as well as the between-environment genetic correlation matrix.
+
+```{r}
+input_asr2 <- unstr_asr_input(ntraits = 1,
+                              nenvs = nenvs,
+                              mean = mu,
+                              var = de,
+                              corA = Ce)
+input_asr2
+```
+
+<br/>
+
+An additive genetic trait representing grain yield is then simulated, which produces 10 columns in the founder population. The columns contain the genetic values for each environment.
+
+```{r}
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nseg_sites,
+             mean = input_asr2$mean,
+             var = input_asr2$var,
+             corA = input_asr2$corA)
+founders2 <- newPop(founders) # create pop-class object
+head(founders2@gv)
+```
+
+<br/>
+
+The wheat genotypes are generated by randomly crossing the founders using the `randCross()` function, and then made into doubled haploid (DH) lines using the `makeDH()` function.
+
+```{r}
+f1s <- randCross(pop = founders2, 
+                 nCrosses = 20, # no. crosses
+                 nProgeny = 10) # no. progeny per cross
+DHs <- makeDH(pop = f1s, nDH = 1)
+DHs
+```
+
+<br/>
+
+FieldSimR's wrapper function `unstr_asr_output()` is then used to obtain the genetic values for the DH population. 
+
+```{r}
+gv_df2 <- unstr_asr_output(pop = DHs,
+                           ntraits = 1,
+                           nenvs = nenvs,
+                           nreps = nreps)
+head(gv_df2)
+GV <- matrix(gv_df2$gv.Trait1[gv_df2$rep == 1], ncol = nenvs)
+round(mean(GV), digits = 2) # overall trait mean in the DH population
+round(cov2cor(var(GV)), digits = 2) # simulated between-environment genetic correlation matrix in the DH population
+round(Ce, digits = 2) # expected between-environment genetic correlation matrix
+round(mean(diag(var(GV))), digits = 2) # overall trait variance in the DH population
+```
+
+<br/>
+
+##### **Measures of variance explained**
+
+It is possible to obtain genotype main effects and GxE interaction effects for this approach, although these components were not explicitly simulated. The proportion of main effect and interaction variance can also be formally quantified to aid with interpretation.
+
+The genotype main effects are obtained as simple averages across environments.
+
+```{r}
+g_main <- rowMeans(GV)
+round(var(g_main), digits = 2) # simulated main effect variance
+Ge <- sqrt(De) %*% Ce %*% sqrt(De)
+round(mean(Ge), digits = 2) # expected main effect variance
+```
+
+<br/>
+
+The GxE interaction effects are then obtained after adjusting for the genotype main effects.
+
+```{r}
+ge_int <- c(GV - g_main)
+GE_int <- matrix(ge_int, ncol = nenvs)
+round(var(GE_int), digits = 2) # simulated interaction variance matrix
+round(mean(diag(var(GE_int))), digits = 2) # simulated pooled interaction variance
+round(mean(diag(Ge - mean(Ge))), digits = 2) # expected pooled interaction variance
+```
+
+```{r, echo = FALSE}
+# effects_df2$g_main <- g_main
+# effects_df2$ge_int <- ge_int
+```
+
+<br/>
+
+The pooled interaction variance can be further split into heterogeneity of genetic variance and lack of genetic correlation (Cooper et al., 1994).
+
+```{r}
+round(sum((sqrt(diag(var(GV))) - mean(sqrt(diag(var(GV)))))^2)/nenvs, digits = 2) # heterogeneity of genetic variance
+round(sum(outer(sqrt(diag(var(GV))), sqrt(diag(var(GV))), "*") * (1 - cov2cor(var(GV))))/nenvs^2, digits = 2) # lack of genetic correlation
+```
+This indicates that 0.1 of the interaction variance corresponds to changes in scale between environments and 0.9 corresponds to changes in rank.
+
+<br/>
+
+### **2. Simulating the plot errors with FieldSimR**
+
+The plot errors are obtained as the sum of spatial, random and extraneous error terms.
+The proportions of spatial and extraneous error variance are sampled from a continuous uniform distribution ranging from 0.2 to 0.6 and from 0 to 0.2, respectively. This produces a mean proportion of spatial error variance of 0.5 and a mean proportion of extraneous error variance of  0.1. FieldSimR will then allocate the remaining error variance to the random errors by default. 
+
+The initial simulation parameters are:
+
+```{r}
+spatial_model <- "AR1:AR1"
+round(sigma2e, digits = 2) # error variance
+prop_spatial <- runif(nenvs, min = 0.2, max = 0.6) # proportions of spatial error variance
+round(prop_spatial, digits = 2)
+prop_ext <- runif(nenvs, min = 0, max = 0.2) # proportions of extraneous error variance
+round(prop_ext, digits = 2)
+round(1 - (prop_spatial + prop_ext), digits = 2) # proportions of random error variance
+```
+
+The column and row autocorrelations are sampled from a continuous uniform distribution ranging from 0.3 to 0.7 and from 0.5 to 0.9, respectively. This produces a mean column autocorrelation of 0.5 and a mean row autocorrelation of 0.7.
+
+```{r}
+col_cor <- runif(nenvs, min = 0.3, max = 0.7) # column autocorrelations
+row_cor <- runif(nenvs, min = 0.5, max = 0.9) # row autocorrelations
+```
+
+The extraneous errors are simulated based on zig-zag ordering between neighbouring rows.
+
+```{r}
+ext_ord <- "zig-zag" # ordering of extraneous variation
+ext_dir <- "row"
+```
+
+The simulation is achieved by populating the `field_trial_error()` function with the terms above. A data frame is returned containing the environment, block, column and row numbers as well as the simulated plot error.
+When `return.effects = TRUE`, a list is returned with an additional data frame containing the spatial, random and extraneous error terms.
+
+```{r}
+error_df <- field_trial_error(ntraits = 1,
+                              nenvs = nenvs,
+                              nblocks = nblocks,
+                              block.dir = block_dir,
+                              ncols = ncols,
+                              nrows = nrows,
+                              varR = sigma2e,
+                              spatial.model = spatial_model,
+                              col.cor = col_cor,
+                              row.cor = row_cor,
+                              prop.spatial = prop_spatial,
+                              ext.ord = ext_ord,
+                              ext.dir = ext_dir,
+                              prop.ext = prop_ext,
+                              return.effects = TRUE)
+head(error_df$error.df) # data frame with simulated plot errors
+head(error_df$Trait1) # data frame with simulated spatial, random and extraneous errors <--
+```
+
+<br/>
+
+The separate error terms can be displayed using FieldSimR's function `plot_effects()`.
+The spatial errors for environment 1 are given by:
+
+```{r, fig.width = 9.5, fig.height = 4.5}
+plot_effects(error_df$Trait1[error_df$Trait1$env == 1,], effect = "e.spat")
+```
+
+<br/>
+
+The total plot errors for environment 1 are given by:
+
+```{r, fig.width = 9.5, fig.height = 4.5}
+plot_effects(error_df$error.df[error_df$error.df$env == 1,], effect = "e.Trait1")
+```
+
+<br/>
+
+The theoretical and sample variograms can be displayed using FieldSimR’s functions `theoretical_variogram()` and `sample_variogram()`. 
+The sample variogram for environment 1 for the total plot errors is given by:
+
+```{r, fig.width = 9.5, fig.height = 4.5}
+sample_variogram(error_df$error.df[error_df$error.df$env == 1,], effect = "e.Trait1")
+```
+
+<br/>
+
+### **3. Generating the phenotypes**
+
+The phenotypes are generated using FieldSimR's function `make_phenotypes()`. 
+When `randomise = TRUE`, genotypes are allocated to plots using a randomised complete block design.
+
+```{r}
+met_ls <- make_phenotypes(gv.df = gv_df2, error.df = error_df, randomise = TRUE, return.effects = TRUE)
+met_df <- met_ls$pheno.df
+head(met_df)
+```
+
+The true genetic values are also added to aid with interpretation.
+
+```{r}
+met_df$gv.Trait1 <- met_ls$Trait1$gv.Trait1
+head(met_df)
+```
+
+<br/>
+
+The phenotypes for environment 1 are given by:
+
+```{r, fig.width = 9.5, fig.height = 4.5}
+plot_effects(met_df[met_df$env == 1,], effect = "y.Trait1")
+```
+
+<br/>
+
+##### **Measures of heritability and expected expected accuracy**
+
+The simulated plot-level and line-mean heritabilities can be formally quantified to aid with interpretation. 
+
+The plot-level heritabilities within environments are:
+
+```{r}
+round(c(by(met_df[,c("y.Trait1","gv.Trait1")], met_df$env, function(x) {cor(x$y.Trait1, x$gv.Trait1)}))^2, digits = 2) # simulated plot-level heritabilities
+round(de/(de + sigma2e), digits = 2) # expected plot-level heritabilities
+```
+
+The minor discrepancies here are a result of the sampling process.
+
+<br/>
+
+The line-mean heritabilities within environments are:
+
+```{r}
+ave_yield <- with(met_df, tapply(y.Trait1, list(id, env), mean))
+tmp <- met_df[met_df$block == 1,]
+tmp <- tmp[order(tmp$env, tmp$id),]
+round(c(by(tmp[,c("y.Trait1","gv.Trait1")], tmp$env, function(x) {cor(x$y.Trait1, x$gv.Trait1)}))^2, digits = 2) # simulated line-mean heritabilities
+round(de/(de + sigma2e/nreps), digits = 2) # expected line-mean heritabilities
+round(c(by(tmp[,c("y.Trait1","gv.Trait1")], tmp$env, function(x) {cor(x$y.Trait1, x$gv.Trait1)})), digits = 2) # simulated prediction accuracies
+round(sqrt(de/(de + sigma2e/nreps)), digits = 2) # expected prediction accuracies
+```
+
+<br/>
+
+The line-mean heritability across all environments is:
+
+```{r}
+ave_yield <- with(met_df, tapply(y.Trait1, id, mean))
+round(cor(ave_yield, g_main)^2, digits = 2) # simulated line-mean heritability
+round(var(g_main)/(var(g_main) + mean(diag(var(GE_int)))/nenvs + sigma2e/(nenvs*nreps)), digits = 2) # expected line-mean heritability
+round(cor(ave_yield, g_main)^2, digits = 2) # simulated prediction accuracy
+round(sqrt(var(g_main)/(var(g_main) + mean(diag(var(GE_int)))/nenvs + sigma2e/(nenvs*nreps))), digits = 2) # expected prediction accuracy
+```
+
+<br/>
+
+<br/>
+
+
