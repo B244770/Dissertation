@@ -34,7 +34,7 @@ nReps <- 10
 scenarios <- list(
   list(nGenos = 1000, nEnvs = 1, nBlocks = 2),
   list(nGenos = 500, nEnvs = 2, nBlocks = 2),
-  list(nGenos = 250, nEnvs = 4, nBlocks = 2)
+  list(nGenos = 250, nEnvs = 4, nBlocks = 2),
   list(nGenos = 1000, nEnvs = 1, nBlocks = 2),
   list(nGenos = 1000, nEnvs = 1, nBlocks = 1),
   list(nGenos = 1000, nEnvs = 1, nBlocks = 2),
