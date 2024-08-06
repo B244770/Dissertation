@@ -6,7 +6,8 @@
 *.docx
 *.html
 *.pdf
-*/
+pre/
+reference/
 dissertation_repo_key
 dissertation_repo_key.pub
-/Proposal
+Proposal/
