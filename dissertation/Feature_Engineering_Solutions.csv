@@ -1,9 +1,0 @@
-Solution,Applicable Models,Details
-Standardization/Normalization,"SVM, Neural Network, GBM","a. Standardization: Convert features to a distribution with a mean of 0 and standard deviation of 1. Important for SVM and neural networks due to sensitivity to feature scale.
-b. Normalization: Scale feature values to between 0 and 1 to speed up model convergence, especially in neural networks."
-Feature selection,"Random Forest, GBM, SVM","a. Based on feature importance: Use random forest or GBM to calculate feature importance and select the most important features.
-b. Principal component analysis (PCA): Reduce dimensionality by converting features into principal components, retaining main information. Useful for SVM and neural networks."
-Feature combination and interactive features,"GBM, Neural Network, SVM","a. Feature combination: Combine existing features to create new interactive features, capturing complex relationships. Effective for GBM and neural networks.
-b. Polynomial features: Expand feature space by generating polynomial features (e.g., square, cube). Works well in SVM with kernel functions."
-Processing categorical features,"SVM, Random Forest, GBM, Neural Network",Category encoding (One-Hot Encoding): Convert non-numeric categorical features into numerical features. Important for neural networks and SVM.
-Processing missing values,All Models,"Interpolation or filling missing values: Use mean, median, or nearest neighbor methods to fill in missing values, avoiding errors during training."
