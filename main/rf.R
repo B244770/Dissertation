@@ -1,21 +1,17 @@
-# 加载必要的包
 library(randomForest)
 library(caret)
 library(ggplot2)
 library(reshape2)
 
-# 提取特征向量的函数
+# extract features
 extract_features_from_matrices <- function(matrices) {
-  # 展平设计矩阵和重复矩阵
   design_vector <- as.vector(matrices$design_matrix)
   rep_vector <- as.vector(matrices$rep_matrix)
-  
-  # 合并向量
   combined_vector <- c(design_vector, rep_vector)
   return(combined_vector)
 }
 
-# 从结果中提取数据的函数
+# extract data from scenarios
 extract_data <- function(results_all_configs) {
   results_list <- list()
   
@@ -24,43 +20,46 @@ extract_data <- function(results_all_configs) {
     for (run_index in seq_along(config_results)) {
       score <- as.numeric(config_results[[run_index]]$score)
       features_vector <- extract_features_from_matrices(config_results[[run_index]]$matrices)
-      
-      # 直接存储分数和特征向量在一个列表中
       results_list[[length(results_list) + 1]] <- list(Score = score, Features = features_vector)
     }
   }
   
   return(results_list)
 }
-
-# 假设已经加载了 results_all_configs 数据
-# results_all_configs <- your_loaded_data_here
+# load data from scenario 2 when nEnvs = 20
+nEnvs <- 20
 results_list <- extract_data(results_all_configs["20"])
 
-# 转换数据格式
+# convert data formats
 features_matrix <- do.call(rbind, lapply(results_list, function(x) x$Features))
 scores_vector <- sapply(results_list, function(x) x$Score)
 
-# 标准化特征
+# extract column names
+colnames(features_matrix) <- paste0("V", 1:ncol(features_matrix))
+
+# standardise features
 scaled_features <- scale(features_matrix)
 
-# 训练初始的随机森林模型以评估特征重要性
+# restore colnames
+colnames(scaled_features) <- colnames(features_matrix)
+
+# feature importance
 initial_rf_model <- randomForest(x = scaled_features, y = scores_vector, ntree = 500)
 importance_scores <- importance(initial_rf_model)
 selected_features <- names(importance_scores)[importance_scores > mean(importance_scores)]
 
-# 选择重要特征
+# select features
 reduced_features_matrix <- scaled_features[, selected_features]
 
 #################################################
 
-# 拟合随机森林模型
+# fitting
 rf_model <- randomForest(x = scaled_features, y = scores_vector, ntree = 500)
 print(summary(rf_model))
 
 #################################################
 
-# 定义交叉验证函数
+# define cv
 cross_validation_rf <- function(features, scores, folds = 5) {
   set.seed(123)
   n <- nrow(features)
@@ -82,20 +81,19 @@ cross_validation_rf <- function(features, scores, folds = 5) {
   return(cv_results)
 }
 
-# 运行交叉验证
+# run
 cv_results_rf <- cross_validation_rf(scaled_features, scores_vector)
 
-# 计算平均交叉验证准确性
+# mean accuracy
 mean_cv_accuracy_rf <- mean(cv_results_rf)
 print(mean_cv_accuracy_rf)
 
 #################################################
 
-# 可视化重要性
+# visualise imporatance
 importance_df <- as.data.frame(importance(rf_model))
 importance_df$Feature <- rownames(importance_df)
 
-# 热图
 heatmap_data <- data.frame(Feature = importance_df$Feature, Importance = importance_df$IncNodePurity)
 heatmap_data$LogImportance <- 0-(log(importance_df$IncNodePurity + 1e-10))
 ggplot(heatmap_data, aes(x = Feature, y = LogImportance)) +
@@ -107,7 +105,7 @@ ggplot(heatmap_data, aes(x = Feature, y = LogImportance)) +
 
 #################################################
 
-# 折线图
+# line plot
 ggplot(importance_df, aes(x = Feature, y = MeanDecreaseGini, group = 1)) +
   geom_line() +
   geom_point() +
@@ -117,7 +115,7 @@ ggplot(importance_df, aes(x = Feature, y = MeanDecreaseGini, group = 1)) +
 
 #################################################
 
-# 交叉验证结果折线图
+# results cv
 cv_results_df <- data.frame(Fold = 1:5, Accuracy = cv_results_rf)
 
 ggplot(cv_results_df, aes(x = Fold, y = Accuracy)) +

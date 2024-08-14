@@ -24,7 +24,7 @@ make_phenotypes <- function(gv.df, error.df, randomise = FALSE, return.effects =
     stop("'error.df' must be a data frame")
   }
   
-  # 确保包含必需的列
+  # include the required columns
   if (any(!c("env", "rep", "id") %in% colnames(gv.df))) {
     stop("'gv.df' must contain the columns 'env', 'rep', 'id', and the genetic values for each trait")
   }
@@ -32,9 +32,8 @@ make_phenotypes <- function(gv.df, error.df, randomise = FALSE, return.effects =
     stop("'error.df' must contain the columns 'env', 'block', 'col', 'row', and the plot errors for each trait")
   }
   
-  # 根据设计矩阵和重复次数矩阵重新构建 gv.df 和 error.df
-  # 这里假设 error.df 是已经按照设计矩阵和重复次数矩阵预先准备好的
-  # 合并 gv.df 和 error.df 数据
+  
+  # combine gvs and errors
   gv.df$env <- factor(as.numeric(as.character(gv.df$env)))
   gv.df$rep <- factor(as.numeric(as.character(gv.df$rep)))
   gv.df$id <- factor(as.numeric(as.character(gv.df$id)))
@@ -44,7 +43,7 @@ make_phenotypes <- function(gv.df, error.df, randomise = FALSE, return.effects =
   error.df$col <- factor(as.numeric(as.character(error.df$col)))
   error.df$row <- factor(as.numeric(as.character(error.df$row)))
   
-  # 排序并唯一化
+  # sort and unique
   gv.df <- gv.df[order(gv.df$env, gv.df$rep), ]
   gv.df <- unique(gv.df)
   error.df <- error.df[order(error.df$env, error.df$block), ]
@@ -58,7 +57,7 @@ make_phenotypes <- function(gv.df, error.df, randomise = FALSE, return.effects =
   if (randomise) {
     gv.df$ord <- sample(nrow(gv.df))
     gv.df <- gv.df[order(gv.df$ord), ]
-    gv.df$ord <- NULL # 去除序号列
+    gv.df$ord <- NULL # remove the sequence number column
   }
   
   # generate pheno data
@@ -71,7 +70,7 @@ make_phenotypes <- function(gv.df, error.df, randomise = FALSE, return.effects =
   # rename pheno column
   colnames(pheno_df)[6:(5+ntraits)] <- paste0("y.Trait", 1:ntraits)
   
-  # 如果需要返回基因效应和环境误差
+  # return the genetic effect and environmental error as required
   if (return.effects) {
     effects_df <- list()
     for (i in 1:ntraits) {
@@ -168,8 +167,7 @@ simulate_experiment <- function(design_matrix, rep_matrix) {
   # get gv
   dhs_gvs_df <- data.frame(id = DHs@id)
   
-  # DHs@gv 是一个矩阵或数据框，其中列名为 Trait1, Trait2, ..., Traitn
-  # 将这些性状值合并到 dhs_gvs_df 数据框中
+  # merge trait values into the dhs_gvs_df
   dhs_gvs_df <- cbind(dhs_gvs_df, DHs@gv)
   
   
@@ -192,7 +190,7 @@ simulate_experiment <- function(design_matrix, rep_matrix) {
         trait_name <- paste("Trait", env, sep = "")  # create Trait n
         geno_value <- selected_gvs[[trait_name]][geno]  # get gv
         
-        # 为每个重复生成一行数据
+        # generate a row for each replication
         for (rep in 1:num_reps) {
           gv_df <- rbind(gv_df, data.frame(env = env, rep = rep, id = geno_id, gv = geno_value))
         }

@@ -3,7 +3,7 @@ library(caret)
 library(ggplot2)
 library(reshape2)
 
-# 提取特征向量的函数
+# extracting features
 extract_features_from_matrices <- function(matrices) {
   design_vector <- as.vector(matrices$design_matrix)
   rep_vector <- as.vector(matrices$rep_matrix)
@@ -11,7 +11,7 @@ extract_features_from_matrices <- function(matrices) {
   return(combined_vector)
 }
 
-# 从结果中提取数据的函数
+# extract data from scenarios
 extract_data <- function(results_all_configs) {
   results_list <- list()
   for (env_config in names(results_all_configs)) {
@@ -25,52 +25,52 @@ extract_data <- function(results_all_configs) {
   return(results_list)
 }
 
-# results_all_configs <- choose 20 envs as example
-nEnvs <- 20    # 环境数量
+# load data from scenario 2 when nEnvs = 20
+nEnvs <- 20
 results_list <- extract_data(results_all_configs["20"])
 
-# 转换数据格式
+# convert data formats
 features_matrix <- do.call(rbind, lapply(results_list, function(x) x$Features))
 scores_vector <- sapply(results_list, function(x) x$Score)
 
-# 提取列名
+# extract column names
 colnames(features_matrix) <- paste0("V", 1:ncol(features_matrix))
 
-# 标准化特征
+# standardise features
 scaled_features <- scale(features_matrix)
 
-# 恢复列名
+# restore colnames
 colnames(scaled_features) <- colnames(features_matrix)
 
-# 转换为矩阵格式
+# turn to matrix
 x_train <- as.matrix(scaled_features)
 y_train <- scores_vector
 
 #################################################
 
-# 定义生成器模型
+# define generator
 generator <- keras_model_sequential() %>%
   layer_dense(units = 128, activation = 'relu', input_shape = 100) %>%
   layer_dense(units = ncol(x_train), activation = 'linear')
 
-# 定义判别器模型
+# define
 discriminator <- keras_model_sequential() %>%
   layer_dense(units = 128, activation = 'relu', input_shape = ncol(x_train)) %>%
   layer_dense(units = 1, activation = 'sigmoid')
 
-# 编译判别器模型
+# compiling
 discriminator %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(),
   metrics = c('accuracy')
 )
 
-# 定义GAN模型
+# define gan
 gan_input <- layer_input(shape = 100)
 gan_output <- discriminator(generator(gan_input))
 gan <- keras_model(gan_input, gan_output)
 
-# 编译GAN模型
+# compile gan
 gan %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam()
@@ -78,7 +78,7 @@ gan %>% compile(
 
 #################################################
 
-# 训练GAN模型
+# train gan
 train_gan <- function(generator, discriminator, gan, x_train, epochs, batch_size) {
   for (epoch in 1:epochs) {
     noise <- matrix(runif(batch_size * 100), nrow = batch_size, ncol = 100)
@@ -96,16 +96,16 @@ train_gan <- function(generator, discriminator, gan, x_train, epochs, batch_size
   }
 }
 
-# 运行训练
+# run HERE!
 train_gan(generator, discriminator, gan, x_train, epochs = 50, batch_size = 16)
 
 #################################################
 
-# 生成新的数据
+# generate new data
 noise <- matrix(runif(nrow(x_train) * 100), nrow = nrow(x_train), ncol = 100)
 generated_data <- generator %>% predict(noise)
 
-# 可视化生成的数据与真实数据的比较
+# compare real to pseudo
 generated_data_df <- as.data.frame(generated_data)
 real_data_df <- as.data.frame(x_train)
 generated_data_df$type <- 'Generated'
@@ -119,7 +119,7 @@ ggplot(melt(combined_data_df, id.vars = "type"), aes(x = variable, y = value, co
 
 #################################################
 
-# 定义交叉验证函数
+# define cv
 cross_validation_gan <- function(generator, discriminator, gan, x, y, folds = 5) {
   set.seed(123)
   n <- nrow(x)
@@ -142,16 +142,16 @@ cross_validation_gan <- function(generator, discriminator, gan, x, y, folds = 5)
   return(cv_results)
 }
 
-# 运行交叉验证
+# run cv
 cv_results_gan <- cross_validation_gan(generator, discriminator, gan, x_train, y_train)
 
-# 计算平均交叉验证准确性
+# calculate mean accuracy
 mean_cv_accuracy_gan <- mean(cv_results_gan)
 print(mean_cv_accuracy_gan)
 
 #################################################
 
-# 可视化交叉验证结果
+# cv results visualise
 cv_results_df <- data.frame(Fold = 1:5, Accuracy = cv_results_gan)
 
 ggplot(cv_results_df, aes(x = Fold, y = Accuracy)) +

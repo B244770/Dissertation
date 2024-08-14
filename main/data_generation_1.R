@@ -127,8 +127,8 @@ for (scenario in 1:nScenarios) { # scenario <- 2; rep <- 1
     
     # sample gene values from DH group
     dhs_gvs_df <- data.frame(
-      id = DHs@id,         # 获取id信息
-      Trait1 = DHs@gv      # 获取对应的遗传值
+      id = DHs@id,
+      Trait1 = DHs@gv
     )
     # sampling and parsing as interger
     selected_gvs <- sample_n(dhs_gvs_df, nGenos)
@@ -136,20 +136,17 @@ for (scenario in 1:nScenarios) { # scenario <- 2; rep <- 1
     names(selected_gvs)[names(selected_gvs) == "Trait1"] <- "gv.Trait1"
     
     # generate gv data frame using sampling
-    # 总行数
-    
-    # generate gv data frame using sampling
     gv_df <- data.frame(
-      env = rep(1:nEnvs, each = nplots), # 每个环境重复它应有的行数
-      rep = rep(rep(1:nBlocks, each = nplots/nBlocks), times = nEnvs), # 每个块在每个环境中重复 ncols * nrows 次
-      id = rep(rep(selected_gvs$id, times = nBlocks), times = nEnvs), # 每个基因型按照需要的总行数均匀分布
+      env = rep(1:nEnvs, each = nplots),
+      rep = rep(rep(1:nBlocks, each = nplots/nBlocks), times = nEnvs),
+      id = rep(rep(selected_gvs$id, times = nBlocks), times = nEnvs),
       gv.Trait1 = runif(n = nplots * nEnvs) 
     )
-    # 使用 left_join 合并数据，并直接用 selected_gvs 中的 gv.Trait1 替换 gv_df 中的 gv.Trait1
+    # merge
     gv_df <- gv_df %>%
       left_join(selected_gvs, by = "id") %>%
       mutate(gv.Trait1 = coalesce(gv.Trait1.y, gv.Trait1.x)) %>%
-      select(-gv.Trait1.x, -gv.Trait1.y)  # 删除辅助列
+      select(-gv.Trait1.x, -gv.Trait1.y)
     
     # sort gv df, to make them grown by order
     sorted_gv <- gv_df %>%

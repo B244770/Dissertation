@@ -1,21 +1,20 @@
-# 加载必要的包
 library(e1071)
 library(caret)
 library(ggplot2)
 library(reshape2)
 
-# 提取特征向量的函数
+# extract features
 extract_features_from_matrices <- function(matrices) {
-  # 展平设计矩阵和重复矩阵
+  # flatten matrices
   design_vector <- as.vector(matrices$design_matrix)
   rep_vector <- as.vector(matrices$rep_matrix)
   
-  # 合并向量
+  # combine flattened matrices to a vector
   combined_vector <- c(design_vector, rep_vector)
   return(combined_vector)
 }
 
-# 从结果中提取数据的函数
+# extract data from scenarios
 extract_data <- function(results_all_configs) {
   results_list <- list()
   
@@ -25,7 +24,7 @@ extract_data <- function(results_all_configs) {
       score <- as.numeric(config_results[[run_index]]$score)
       features_vector <- extract_features_from_matrices(config_results[[run_index]]$matrices)
       
-      # 直接存储分数和特征向量在一个列表中
+      # save score and feature matrix to a list
       results_list[[length(results_list) + 1]] <- list(Score = score, Features = features_vector)
     }
   }
@@ -33,24 +32,23 @@ extract_data <- function(results_all_configs) {
   return(results_list)
 }
 
-# 假设已经加载了 results_all_configs 数据
-# results_all_configs <- your_loaded_data_here
+# load data from scenario 2 when nEnvs = 20
 results_list <- extract_data(results_all_configs["20"])
 
-# 转换数据格式
+# convert data formats
 features_matrix <- do.call(rbind, lapply(results_list, function(x) x$Features))
 scores_vector <- sapply(results_list, function(x) x$Score)
 
-# 提取列名
+# extract column names
 colnames(features_matrix) <- paste0("V", 1:ncol(features_matrix))
 
-# 标准化特征
+# standardise features
 scaled_features <- scale(features_matrix)
 
-# 恢复列名
+# restore colnames
 colnames(scaled_features) <- colnames(features_matrix)
 
-# 拟合SVM模型
+# fit a svm model
 svm_model <- svm(x = scaled_features, y = scores_vector, kernel = "radial")
 print(summary(svm_model))
 
