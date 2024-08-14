@@ -1,0 +1,223 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Test
+```{r}
+library(AlphaSimR)
+nInd <- 1000  # Number of individuals
+nChr <- 21    # Hypothetical number of chromosomes
+segSites <- 200  # Number of segregating sites per chromosome
+
+# Simulate the haplotypes
+haploData <- quickHaplo(nInd=nInd, nChr=nChr, segSites=segSites)
+```
+
+
+```{r}
+library(ggplot2)
+library(reshape2)
+
+# 设置参数
+num_rows <- 10
+num_cols <- 10
+num_plots <- num_rows * num_cols
+num_replicates <- 3  # 可视化的重复次数
+
+# 创建设计函数
+create_design <- function(sparse = FALSE) {
+  design <- matrix(0, nrow = num_rows, ncol = num_cols)
+  num_filled <- if (sparse) { num_plots / 2 } else { num_plots - num_plots / 10 }
+  filled_plots <- sample(1:num_plots, size = num_filled, replace = FALSE)
+  design[filled_plots] <- 1
+  return(design)
+}
+
+# 绘图
+plot_design <- function(design, title) {
+  melted_design <- melt(design)
+  ggplot(melted_design, aes(Var2, Var1)) +
+    geom_tile(aes(fill = factor(value)), colour = "white") +
+    scale_fill_manual(values = c("0" = "white", "1" = "black")) +
+    labs(title = title, x = "", y = "") +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme_minimal() +
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          legend.position = "none")
+}
+
+# 创建空白画布
+par(mfrow = c(num_replicates, 2))
+
+# 生成并绘制设计
+for (i in 1:num_replicates) {
+  # 稀疏设计
+  sparse_design <- create_design(sparse = TRUE)
+  print(plot_design(sparse_design, sprintf('Sparse Design Replicate %d', i)))
+  
+  # 部分重复设计
+  partially_replicated_design <- create_design(sparse = FALSE)
+  print(plot_design(partially_replicated_design, sprintf('Partially Replicated Design Replicate %d', i)))
+}
+
+```
+
+Step 1: Simulate genetic data using quickHaplo
+```{r}
+# Clear the workspace
+rm(list=ls())
+
+# Load required libraries. Assuming FieldSimR is already installed.
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+# Simulation parameters
+nGenos <- 1000    # Number of genotypes
+nEnvs <- 5      # Number of environments
+nFounders <- 20  # Number of founders in the population
+nChr <- 21       # Number of chromosomes
+nSegSites <- 300 # Number of segregating sites per chromosome
+mu <- 4          # Overall trait mean
+sigma2 <- 0.2    # Overall trait variance
+H2 <- 0.3        # Average plot-level heritability
+sigma2e <- sigma2 / H2 - sigma2 # Error variance
+
+# Simulate the founder population
+founders <- runMacs(nInd=nFounders, nChr=nChr, segSites=nSegSites, inbred=TRUE, species="WHEAT", nThreads=2)
+
+
+# Create a simulation parameter object
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr=nSegSites, mean=mu, var=sigma2)
+founders <- newPop(founders)
+# Generate inbred wheat genotypes and create doubled haploid (DH) lines
+f1s <- randCross(pop=founders, nCrosses=20, nProgeny=5)
+DHs <- makeDH(pop=f1s, nDH=1)
+```
+
+
+```{r}
+nreps <- nblocks <- 1 # Number of reps/ blocks per env
+```
+
+```{r}
+# 创建基因值数据框
+gv <- c(DHs@gv)
+gv_df <- data.frame(env=factor(rep(1:nEnvs)),
+                    rep=nreps,
+                    id=factor(1:(nGenos*nEnvs)),
+                    gv=gv)
+
+# 检查 gv_df 的维度
+dim(gv_df)
+
+# 创建 field_trial_error 参数
+error_df <- field_trial_error(
+  ntraits = 1,
+  nenvs = nEnvs,
+  nblocks = nblocks,
+  block.dir = "row",
+  ncols = 20,
+  nrows = 50,
+  varR = sigma2e,
+  spatial.model = "AR1",
+  col.cor = 0.5,
+  row.cor = 0.7,
+  prop.spatial = 0.4,
+  ext.ord = "random",
+  ext.dir = "both",
+  prop.ext = 0.2,
+  return.effects = TRUE
+)
+
+# 检查 error_df 的维度
+dim(error_df$error.df)
+
+```
+
+
+# Obtain genetic values for the DH population
+```{r}
+gv <- c(DHs@gv)
+gv_df <- data.frame(env=factor(rep(1:nEnvs)),
+                    rep=nreps,
+                    id=factor(1:(nGenos*nEnvs)),
+                    gv=gv)
+
+# Generate plot errors and phenotypes using FieldSimR
+error_df <- field_trial_error(
+  ntraits = 1,
+  nenvs = nEnvs,
+  nblocks = nblocks,
+  block.dir = "row",
+  ncols = 20,
+  nrows = 50,
+  varR = sigma2e,
+  spatial.model = "AR1",
+  col.cor = 0.5,
+  row.cor = 0.7,
+  prop.spatial = 0.4,
+  ext.ord = "random",
+  ext.dir = "both",
+  prop.ext = 0.2,
+  return.effects = TRUE
+)
+```
+
+```{r}
+# Allocate genotypes to plots using a randomised complete block design
+trial_ls <- make_phenotypes(gv.df=gv_df, error.df=error_df, randomise=TRUE, return.effects=TRUE)
+trial_df <- trial_ls$pheno.df
+
+# True genetic values are also included for interpretation
+trial_df$gv.Trait1 <- trial_ls$Trait1$gv
+
+# Calculate plot-level heritability and prediction accuracy
+plot_heritability <- cor(trial_df$y.Trait1, trial_df$gv.Trait1)^2
+prediction_accuracy <- sqrt(plot_heritability)
+
+# Output the first few lines of the simulated dataframe
+head(trial_df)
+
+# Generate visualizations of phenotypes and errors using ggplot2
+ggplot(trial_df, aes(x=factor(id), y=y.Trait1)) +
+  geom_bar(stat="identity") +
+  theme_minimal() +
+  labs(title="Phenotype Distribution", x="Genotype ID", y="Phenotype")
+
+```
+Plotting error df
+```{r}
+plot_effects(error_df$Trait1[error_df$Trait1$env == 1,], effect = "e.spat")
+plot_effects(error_df$Trait1[error_df$Trait1$env == 2,], effect = "e.spat")
+plot_effects(error_df$Trait1[error_df$Trait1$env == 3,], effect = "e.spat")
+plot_effects(error_df$Trait1[error_df$Trait1$env == 4,], effect = "e.spat")
+plot_effects(error_df$Trait1[error_df$Trait1$env == 5,], effect = "e.spat")
+```
+
+Total plot error
+```{r}
+plot_effects(error_df$error.df[error_df$error.df$env == 1,], effect = "e.Trait1")
+plot_effects(error_df$error.df[error_df$error.df$env == 2,], effect = "e.Trait1")
+plot_effects(error_df$error.df[error_df$error.df$env == 3,], effect = "e.Trait1")
+plot_effects(error_df$error.df[error_df$error.df$env == 4,], effect = "e.Trait1")
+plot_effects(error_df$error.df[error_df$error.df$env == 5,], effect = "e.Trait1")
+```
+
+```{r}
+sample_variogram(error_df$error.df[error_df$error.df$env == 1,], effect = "e.Trait1")
+sample_variogram(error_df$error.df[error_df$error.df$env == 2,], effect = "e.Trait1")
+sample_variogram(error_df$error.df[error_df$error.df$env == 3,], effect = "e.Trait1")
+sample_variogram(error_df$error.df[error_df$error.df$env == 4,], effect = "e.Trait1")
+sample_variogram(error_df$error.df[error_df$error.df$env == 5,], effect = "e.Trait1")
+```
+

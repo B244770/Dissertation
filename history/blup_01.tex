@@ -1,0 +1,673 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(FieldSimR)}
+\FunctionTok{library}\NormalTok{(AlphaSimR)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 载入需要的程序包：R6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 载入程序包：'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:AlphaSimR':
+## 
+##     mutate
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Clear the work environment}
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list =} \FunctionTok{ls}\NormalTok{())}
+
+\CommentTok{\# Population parameters}
+\NormalTok{nFounders }\OtherTok{\textless{}{-}} \DecValTok{50}
+\NormalTok{nChr }\OtherTok{\textless{}{-}} \DecValTok{21}
+\NormalTok{nSegSites }\OtherTok{\textless{}{-}} \DecValTok{1000}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \DecValTok{4}
+\NormalTok{sigma2 }\OtherTok{\textless{}{-}} \FloatTok{0.2}
+\NormalTok{H2 }\OtherTok{\textless{}{-}} \FloatTok{0.3}
+\NormalTok{sigma2e }\OtherTok{\textless{}{-}}\NormalTok{ sigma2 }\SpecialCharTok{/}\NormalTok{ H2 }\SpecialCharTok{{-}}\NormalTok{ sigma2}
+
+\CommentTok{\# create founder group}
+\NormalTok{founders }\OtherTok{\textless{}{-}} \FunctionTok{quickHaplo}\NormalTok{(}\AttributeTok{nInd =}\NormalTok{ nFounders, }\AttributeTok{nChr =}\NormalTok{ nChr, }\AttributeTok{segSites =}\NormalTok{ nSegSites)}
+
+\CommentTok{\# simulation params}
+\NormalTok{SP }\OtherTok{\textless{}{-}}\NormalTok{ SimParam}\SpecialCharTok{$}\FunctionTok{new}\NormalTok{(founders)}
+\NormalTok{SP}\SpecialCharTok{$}\FunctionTok{addTraitA}\NormalTok{(}\AttributeTok{nQtlPerChr =}\NormalTok{ nSegSites, }\AttributeTok{mean =}\NormalTok{ mu, }\AttributeTok{var =}\NormalTok{ sigma2)}
+\NormalTok{founders }\OtherTok{\textless{}{-}} \FunctionTok{newPop}\NormalTok{(founders)}
+
+\CommentTok{\# generate f1 and DH groups}
+\NormalTok{f1s }\OtherTok{\textless{}{-}} \FunctionTok{randCross}\NormalTok{(}\AttributeTok{pop =}\NormalTok{ founders, }\AttributeTok{nCrosses =} \DecValTok{250}\NormalTok{, }\AttributeTok{nProgeny =} \DecValTok{60}\NormalTok{)}
+\NormalTok{DHs }\OtherTok{\textless{}{-}} \FunctionTok{makeDH}\NormalTok{(}\AttributeTok{pop =}\NormalTok{ f1s, }\AttributeTok{nDH =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# 定义场景数和重复数}
+\NormalTok{nScenarios }\OtherTok{\textless{}{-}} \DecValTok{52}
+\NormalTok{nReps }\OtherTok{\textless{}{-}} \DecValTok{10}
+
+\CommentTok{\# scenarios params}
+\NormalTok{scenarios }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{200}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{200}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{200}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{200}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{2000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{8}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{2000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{8}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{2000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{8}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{2000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{250}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{8}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{3000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{750}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{3000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{750}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{2}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{3000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{750}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{3}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{3000}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{1}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{1500}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{2}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{750}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{4}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{5}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{10}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{15}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{20}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{),}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{nGenos =} \DecValTok{600}\NormalTok{, }\AttributeTok{nEnvs =} \DecValTok{25}\NormalTok{, }\AttributeTok{nBlocks =} \DecValTok{4}\NormalTok{)}
+\NormalTok{)}
+
+\CommentTok{\# initial results matrix}
+\NormalTok{results }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =}\NormalTok{ nReps, }\AttributeTok{ncol =}\NormalTok{ nScenarios)}
+
+\CommentTok{\# Replication is implemented in both way of duplicated blocks and repeated simulation}
+\ControlFlowTok{for}\NormalTok{ (scenario }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nScenarios) \{ }\CommentTok{\# scenario \textless{}{-} 2; rep \textless{}{-} 1}
+  \ControlFlowTok{for}\NormalTok{ (rep }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nReps) \{}
+    \CommentTok{\# params assignment}
+\NormalTok{    params }\OtherTok{\textless{}{-}}\NormalTok{ scenarios[[scenario]]}
+\NormalTok{    nGenos }\OtherTok{\textless{}{-}}\NormalTok{ params}\SpecialCharTok{$}\NormalTok{nGenos}
+\NormalTok{    nEnvs }\OtherTok{\textless{}{-}}\NormalTok{ params}\SpecialCharTok{$}\NormalTok{nEnvs}
+\NormalTok{    nBlocks }\OtherTok{\textless{}{-}}\NormalTok{ params}\SpecialCharTok{$}\NormalTok{nBlocks}
+    
+    \CommentTok{\# cols and rows }
+    \CommentTok{\# nrows * ncols = nGenos * nEnvs = total plotS}
+\NormalTok{    nplots }\OtherTok{\textless{}{-}}\NormalTok{ nGenos}\SpecialCharTok{*}\NormalTok{nBlocks}
+\NormalTok{    nrows }\OtherTok{\textless{}{-}} \DecValTok{50}
+\NormalTok{    ncols }\OtherTok{\textless{}{-}}\NormalTok{ nplots}\SpecialCharTok{/}\NormalTok{nrows}
+    
+    
+    \CommentTok{\# generate field trial error}
+\NormalTok{    error\_ls }\OtherTok{\textless{}{-}} \FunctionTok{field\_trial\_error}\NormalTok{(}
+      \AttributeTok{ntraits =} \DecValTok{1}\NormalTok{,}
+      \AttributeTok{nenvs =}\NormalTok{ nEnvs,}
+      \AttributeTok{nblocks =}\NormalTok{ nBlocks,}
+      \AttributeTok{block.dir =} \StringTok{"col"}\NormalTok{, }\CommentTok{\# block layouts \#\# !!bug here col is not working}
+      \AttributeTok{ncols =}\NormalTok{ ncols,}
+      \AttributeTok{nrows =}\NormalTok{ nrows,}
+      \AttributeTok{varR =}\NormalTok{ sigma2e,}
+      \AttributeTok{spatial.model =} \StringTok{"AR1"}\NormalTok{,}
+      \AttributeTok{col.cor =} \FloatTok{0.5}\NormalTok{,}
+      \AttributeTok{row.cor =} \FloatTok{0.7}\NormalTok{,}
+      \AttributeTok{prop.spatial =} \FloatTok{0.5}\NormalTok{,}
+      \AttributeTok{return.effects =} \ConstantTok{TRUE}
+\NormalTok{    )}
+    
+    \CommentTok{\# sample gene values from DH group}
+\NormalTok{    dhs\_gvs\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{id =}\NormalTok{ DHs}\SpecialCharTok{@}\NormalTok{id,         }\CommentTok{\# 获取id信息}
+      \AttributeTok{Trait1 =}\NormalTok{ DHs}\SpecialCharTok{@}\NormalTok{gv      }\CommentTok{\# 获取对应的遗传值}
+\NormalTok{    )}
+    \CommentTok{\# sampling and parsing as interger}
+\NormalTok{    selected\_gvs }\OtherTok{\textless{}{-}} \FunctionTok{sample\_n}\NormalTok{(dhs\_gvs\_df, nGenos)}
+\NormalTok{    selected\_gvs}\SpecialCharTok{$}\NormalTok{id }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(selected\_gvs}\SpecialCharTok{$}\NormalTok{id)}
+    \FunctionTok{names}\NormalTok{(selected\_gvs)[}\FunctionTok{names}\NormalTok{(selected\_gvs) }\SpecialCharTok{==} \StringTok{"Trait1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"gv.Trait1"}
+    
+    \CommentTok{\# generate gv data frame using sampling}
+    \CommentTok{\# 总行数}
+    
+    \CommentTok{\# generate gv data frame using sampling}
+\NormalTok{    gv\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{env =} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{nEnvs, }\AttributeTok{each =}\NormalTok{ nplots), }\CommentTok{\# 每个环境重复它应有的行数}
+      \AttributeTok{rep =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{nBlocks, }\AttributeTok{each =}\NormalTok{ nplots}\SpecialCharTok{/}\NormalTok{nBlocks), }\AttributeTok{times =}\NormalTok{ nEnvs), }\CommentTok{\# 每个块在每个环境中重复 ncols * nrows 次}
+      \AttributeTok{id =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{rep}\NormalTok{(selected\_gvs}\SpecialCharTok{$}\NormalTok{id, }\AttributeTok{times =}\NormalTok{ nBlocks), }\AttributeTok{times =}\NormalTok{ nEnvs), }\CommentTok{\# 每个基因型按照需要的总行数均匀分布}
+      \AttributeTok{gv.Trait1 =} \FunctionTok{runif}\NormalTok{(}\AttributeTok{n =}\NormalTok{ nplots }\SpecialCharTok{*}\NormalTok{ nEnvs) }
+\NormalTok{    )}
+    \CommentTok{\# 使用 left\_join 合并数据，并直接用 selected\_gvs 中的 gv.Trait1 替换 gv\_df 中的 gv.Trait1}
+\NormalTok{    gv\_df }\OtherTok{\textless{}{-}}\NormalTok{ gv\_df }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{left\_join}\NormalTok{(selected\_gvs, }\AttributeTok{by =} \StringTok{"id"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{gv.Trait1 =} \FunctionTok{coalesce}\NormalTok{(gv.Trait1.y, gv.Trait1.x)) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{gv.Trait1.x, }\SpecialCharTok{{-}}\NormalTok{gv.Trait1.y)  }\CommentTok{\# 删除辅助列}
+    
+    \CommentTok{\# sort gv df, to make them grown by order}
+\NormalTok{    sorted\_gv }\OtherTok{\textless{}{-}}\NormalTok{ gv\_df }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{arrange}\NormalTok{(env, rep, id)}
+    
+    
+    \CommentTok{\# generate phenotype data frame}
+\NormalTok{    pheno\_df }\OtherTok{\textless{}{-}} \FunctionTok{make\_phenotypes}\NormalTok{(}
+      \AttributeTok{gv.df =}\NormalTok{ sorted\_gv,}
+      \AttributeTok{error.df =}\NormalTok{ error\_ls}\SpecialCharTok{$}\NormalTok{error.df,}
+      \AttributeTok{randomise =} \ConstantTok{TRUE}
+\NormalTok{    )}
+    
+    \CommentTok{\# Calculate Pearson\textquotesingle{}s coefficient}
+\NormalTok{    results[rep, scenario] }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(}
+      \FunctionTok{with}\NormalTok{(pheno\_df, }\FunctionTok{tapply}\NormalTok{(y.Trait1, id, mean)),}
+      \FunctionTok{with}\NormalTok{(gv\_df, }\FunctionTok{tapply}\NormalTok{(gv.Trait1, id, mean))}
+\NormalTok{    )}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\CommentTok{\# show results}
+\FunctionTok{print}\NormalTok{(results)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
+##  [1,] 0.6935879 0.8095678 0.8744390 0.8831243 0.7739934 0.8708070 0.9439245
+##  [2,] 0.6656889 0.7913196 0.8804952 0.8913058 0.7786418 0.8716824 0.9224327
+##  [3,] 0.6989841 0.7653418 0.8645730 0.8811647 0.7953302 0.8730524 0.9350106
+##  [4,] 0.6616890 0.7535301 0.8913587 0.8662705 0.7912407 0.8724173 0.9284677
+##  [5,] 0.6809129 0.7912962 0.8718431 0.9098676 0.7873381 0.8674081 0.9264993
+##  [6,] 0.6887373 0.7676741 0.8810027 0.8965126 0.7705383 0.8758927 0.9250374
+##  [7,] 0.6647171 0.7744127 0.8821251 0.9051321 0.7860241 0.8583133 0.9271128
+##  [8,] 0.6642109 0.7757669 0.8828637 0.8935076 0.7856979 0.8705442 0.9478464
+##  [9,] 0.6697788 0.7630877 0.8450711 0.8753588 0.7792967 0.8828910 0.9204883
+## [10,] 0.6737206 0.7678191 0.8619734 0.8925085 0.7892762 0.8887437 0.9248765
+##            [,8]      [,9]     [,10]     [,11]     [,12]     [,13]     [,14]
+##  [1,] 0.9463090 0.8393361 0.9124774 0.9439047 0.9529083 0.8788258 0.9349691
+##  [2,] 0.9492913 0.8340116 0.9201671 0.9596424 0.9541595 0.8748314 0.9336194
+##  [3,] 0.9415445 0.8401071 0.8903488 0.9416874 0.9601520 0.8764946 0.9162736
+##  [4,] 0.9380402 0.8303096 0.9113965 0.9599273 0.9642557 0.8703619 0.9279791
+##  [5,] 0.9485105 0.8405439 0.9164267 0.9519357 0.9563078 0.8756798 0.9286425
+##  [6,] 0.9453049 0.8422752 0.9073970 0.9571935 0.9528882 0.8714790 0.9327304
+##  [7,] 0.9424291 0.8358203 0.9085975 0.9481447 0.9574962 0.8766084 0.9288710
+##  [8,] 0.9398516 0.8365779 0.9054629 0.9513521 0.9629464 0.8712037 0.9325349
+##  [9,] 0.9414369 0.8344665 0.9068612 0.9486890 0.9635756 0.8786583 0.9315560
+## [10,] 0.9324439 0.8400279 0.9104007 0.9541749 0.9562762 0.8740780 0.9392483
+##           [,15]     [,16]     [,17]     [,18]     [,19]     [,20]     [,21]
+##  [1,] 0.9654889 0.9776490 0.6548191 0.7606644 0.8866405 0.9303800 0.7866354
+##  [2,] 0.9518762 0.9703412 0.6699486 0.7544887 0.8598218 0.9465334 0.7889310
+##  [3,] 0.9667252 0.9587069 0.6631801 0.7855035 0.8748297 0.9241200 0.7823974
+##  [4,] 0.9569884 0.9718075 0.6607083 0.7679193 0.8941433 0.9196647 0.7744267
+##  [5,] 0.9689905 0.9685773 0.6523067 0.7752517 0.8605812 0.9044802 0.7808092
+##  [6,] 0.9669008 0.9708568 0.6643749 0.7770619 0.8789290 0.9311633 0.7684649
+##  [7,] 0.9619334 0.9717130 0.6547018 0.7835092 0.8703336 0.9366135 0.7781056
+##  [8,] 0.9647812 0.9762748 0.6609474 0.7906002 0.8770211 0.9197503 0.7838902
+##  [9,] 0.9687361 0.9665709 0.6690966 0.7785075 0.8854180 0.9272135 0.7808848
+## [10,] 0.9679451 0.9725089 0.6631636 0.7791091 0.8684344 0.9232874 0.7881759
+##           [,22]     [,23]     [,24]     [,25]     [,26]     [,27]     [,28]
+##  [1,] 0.8628723 0.9289669 0.9595465 0.8428984 0.9175129 0.9593665 0.9799233
+##  [2,] 0.8803828 0.9272553 0.9657066 0.8406135 0.9167816 0.9530016 0.9721108
+##  [3,] 0.8825519 0.9394149 0.9664774 0.8338512 0.9139733 0.9570822 0.9749133
+##  [4,] 0.8622174 0.9194036 0.9681407 0.8518314 0.9037149 0.9523876 0.9751561
+##  [5,] 0.8799923 0.9178576 0.9560181 0.8284555 0.9142048 0.9548436 0.9788488
+##  [6,] 0.8633596 0.9202301 0.9678850 0.8539258 0.9089597 0.9559761 0.9756217
+##  [7,] 0.8718061 0.9385085 0.9603853 0.8491375 0.9092183 0.9466641 0.9751717
+##  [8,] 0.8784429 0.9350400 0.9557946 0.8369864 0.9071396 0.9490031 0.9752486
+##  [9,] 0.8747234 0.9328637 0.9501517 0.8453977 0.9098325 0.9446902 0.9758414
+## [10,] 0.8796749 0.9223140 0.9665818 0.8354784 0.9135802 0.9479983 0.9775375
+##           [,29]     [,30]     [,31]     [,32]     [,33]     [,34]     [,35]
+##  [1,] 0.8752294 0.9351735 0.9642467 0.9837481 0.6581819 0.7755042 0.8663899
+##  [2,] 0.8766154 0.9207796 0.9651766 0.9823871 0.6576084 0.7752210 0.8801121
+##  [3,] 0.8745714 0.9298282 0.9636522 0.9821662 0.6541162 0.7918009 0.8672101
+##  [4,] 0.8766522 0.9253265 0.9596813 0.9797200 0.6683589 0.7804983 0.8583154
+##  [5,] 0.8649678 0.9221480 0.9596393 0.9810435 0.6687556 0.7824533 0.8809282
+##  [6,] 0.8729777 0.9296944 0.9614406 0.9809097 0.6515422 0.7788181 0.8764692
+##  [7,] 0.8699065 0.9276139 0.9669890 0.9828959 0.6803012 0.7789171 0.8685566
+##  [8,] 0.8698199 0.9305602 0.9629053 0.9796699 0.6582485 0.7920418 0.8621303
+##  [9,] 0.8729852 0.9221163 0.9605852 0.9770175 0.6805456 0.7902769 0.8754444
+## [10,] 0.8692315 0.9248972 0.9583772 0.9824088 0.6738544 0.7883253 0.8794191
+##           [,36]     [,37]     [,38]     [,39]     [,40]     [,41]     [,42]
+##  [1,] 0.9051688 0.7834902 0.8759960 0.9336227 0.9425504 0.8438504 0.9126596
+##  [2,] 0.8994165 0.7892726 0.8770524 0.9313271 0.9470775 0.8420941 0.9090233
+##  [3,] 0.8906689 0.7831432 0.8695181 0.9288331 0.9488473 0.8474327 0.9052722
+##  [4,] 0.8937331 0.7909519 0.8728561 0.9253618 0.9484450 0.8445165 0.9021017
+##  [5,] 0.8884800 0.7852218 0.8729252 0.9186569 0.9424327 0.8387513 0.9082851
+##  [6,] 0.8867000 0.7834071 0.8683515 0.9226306 0.9405698 0.8404420 0.9076437
+##  [7,] 0.8941022 0.7832883 0.8653281 0.9261090 0.9399338 0.8413407 0.9065921
+##  [8,] 0.8990516 0.7760958 0.8769634 0.9217694 0.9367258 0.8418852 0.9120691
+##  [9,] 0.8930905 0.7791400 0.8771296 0.9350371 0.9472727 0.8399288 0.9097662
+## [10,] 0.8934676 0.7975471 0.8757175 0.9309115 0.9332832 0.8453789 0.8979647
+##           [,43]     [,44]     [,45]     [,46]     [,47]     [,48]     [,49]
+##  [1,] 0.9455852 0.9637587 0.8769956 0.9320761 0.9620317 0.9711044 0.9841787
+##  [2,] 0.9482632 0.9626988 0.8720728 0.9292834 0.9639097 0.9662484 0.9851210
+##  [3,] 0.9564900 0.9577218 0.8724433 0.9290127 0.9647602 0.9693668 0.9861877
+##  [4,] 0.9537922 0.9644309 0.8665202 0.9293550 0.9650168 0.9712703 0.9846801
+##  [5,] 0.9515159 0.9582975 0.8746526 0.9226545 0.9641222 0.9709467 0.9860586
+##  [6,] 0.9478004 0.9642373 0.8701296 0.9318243 0.9625160 0.9704321 0.9864553
+##  [7,] 0.9532440 0.9591919 0.8723558 0.9313101 0.9664069 0.9730543 0.9840244
+##  [8,] 0.9529725 0.9590458 0.8707816 0.9269859 0.9615987 0.9691850 0.9841167
+##  [9,] 0.9471154 0.9676346 0.8651360 0.9301535 0.9615747 0.9673570 0.9843169
+## [10,] 0.9504729 0.9583176 0.8700509 0.9313283 0.9633268 0.9677237 0.9862674
+##           [,50]     [,51]     [,52]
+##  [1,] 0.9894496 0.9924526 0.9925974
+##  [2,] 0.9890370 0.9933137 0.9933386
+##  [3,] 0.9890024 0.9921844 0.9932696
+##  [4,] 0.9912190 0.9912704 0.9946328
+##  [5,] 0.9895911 0.9916692 0.9938751
+##  [6,] 0.9916749 0.9925277 0.9947932
+##  [7,] 0.9898418 0.9923302 0.9936307
+##  [8,] 0.9908385 0.9912763 0.9938311
+##  [9,] 0.9884979 0.9922789 0.9932305
+## [10,] 0.9899126 0.9916821 0.9933964
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{results\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Scenario =} \FunctionTok{factor}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{nScenarios, }\AttributeTok{each =}\NormalTok{ nReps)),}
+  \AttributeTok{Accuracy =} \FunctionTok{c}\NormalTok{(results)}
+\NormalTok{)}
+\FunctionTok{head}\NormalTok{(results\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Scenario  Accuracy
+## 1        1 0.6935879
+## 2        1 0.6656889
+## 3        1 0.6989841
+## 4        1 0.6616890
+## 5        1 0.6809129
+## 6        1 0.6887373
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# plot results}
+\FunctionTok{ggplot}\NormalTok{(results\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Scenario, }\AttributeTok{y =}\NormalTok{ Accuracy)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Prediction Accuracy Across Scenarios"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Scenario"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Accuracy"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\#\#\#Blup models\#\#\#
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 载入需要的程序包：Matrix
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\NormalTok{gv\_df\_factor }\OtherTok{\textless{}{-}}\NormalTok{ gv\_df}
+
+\NormalTok{gv\_df\_factor}\SpecialCharTok{$}\NormalTok{id }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(gv\_df\_factor}\SpecialCharTok{$}\NormalTok{id)}
+\NormalTok{gv\_df\_factor}\SpecialCharTok{$}\NormalTok{env }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(gv\_df\_factor}\SpecialCharTok{$}\NormalTok{env)}
+
+
+\NormalTok{model\_data }\OtherTok{\textless{}{-}} \FunctionTok{full\_join}\NormalTok{(pheno\_df, gv\_df\_factor, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"id"}\NormalTok{, }\StringTok{"env"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in full_join(pheno_df, gv_df_factor, by = c("id", "env")): Detected an unexpected many-to-many relationship between `x` and `y`.
+## i Row 1 of `x` matches multiple rows in `y`.
+## i Row 410 of `y` matches multiple rows in `x`.
+## i If a many-to-many relationship is expected, set `relationship =
+##   "many-to-many"` to silence this warning.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model\_data }\OtherTok{\textless{}{-}} \FunctionTok{full\_join}\NormalTok{(model\_data, error\_ls}\SpecialCharTok{$}\NormalTok{error.df, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"env"}\NormalTok{, }\StringTok{"block"}\NormalTok{, }\StringTok{"col"}\NormalTok{, }\StringTok{"row"}\NormalTok{))}
+
+\CommentTok{\# check data}
+\FunctionTok{head}\NormalTok{(model\_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   env block col row    id y.Trait1 rep gv.Trait1   e.Trait1
+## 1   1     1   1   1 22296 3.647841   1  4.022135 -0.3742938
+## 2   1     1   1   1 22296 3.647841   2  4.022135 -0.3742938
+## 3   1     1   1   1 22296 3.647841   3  4.022135 -0.3742938
+## 4   1     1   1   1 22296 3.647841   4  4.022135 -0.3742938
+## 5   1     1   1   2 25041 4.837957   1  4.385710  0.4522464
+## 6   1     1   1   2 25041 4.837957   2  4.385710  0.4522464
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# get specific data set, here e.g. rep=1}
+\CommentTok{\# model\_data\_unique \textless{}{-} model\_data[!duplicated(model\_data), ]}
+\NormalTok{model\_data\_unique }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(model\_data, rep}\SpecialCharTok{==}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# genetics values as random effect, others as fixed}
+\NormalTok{model\_blup }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y.Trait1 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ env }\SpecialCharTok{+}\NormalTok{ block }\SpecialCharTok{+}\NormalTok{ col }\SpecialCharTok{+}\NormalTok{ row }\SpecialCharTok{+}\NormalTok{ e.Trait1 }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{id) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1), }\AttributeTok{data =}\NormalTok{ model\_data\_unique)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## fixed-effect model matrix is rank deficient so dropping 3 columns / coefficients
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 7.7346 (tol = 0.002, component 1)
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue
+##  - Rescale variables?
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \CommentTok{\# get blup value}
+\NormalTok{    random\_effects }\OtherTok{\textless{}{-}} \FunctionTok{ranef}\NormalTok{(model\_blup)}
+    \CommentTok{\# print(random\_effects)}
+    
+    
+\NormalTok{    predicted\_values }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model\_blup, }\AttributeTok{re.form =} \ConstantTok{NA}\NormalTok{)}
+    
+    \CommentTok{\# create df for plot}
+\NormalTok{    data\_for\_plot }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Observed =}\NormalTok{ model\_data\_unique}\SpecialCharTok{$}\NormalTok{y.Trait1, }\AttributeTok{Predicted =}\NormalTok{ predicted\_values)}
+    
+    \CommentTok{\# ggplot}
+\NormalTok{    p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data\_for\_plot, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Observed, }\AttributeTok{y =}\NormalTok{ Predicted)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{) }\SpecialCharTok{+}  \CommentTok{\# 添加点，透明度为0.6}
+      \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{intercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{slope =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}  \CommentTok{\# 添加 y=x 的虚线}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Observed Values"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Predicted Values"}\NormalTok{, }\AttributeTok{title =} \StringTok{"Scatter Plot of Observed vs. Predicted Values"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()  }\CommentTok{\# 使用简洁主题}
+    \FunctionTok{print}\NormalTok{(p)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+ \CommentTok{\# get the minimum error}
+\NormalTok{    data\_for\_plot}\SpecialCharTok{$}\NormalTok{Error }\OtherTok{\textless{}{-}} \FunctionTok{abs}\NormalTok{(model\_data\_unique}\SpecialCharTok{$}\NormalTok{y.Trait1 }\SpecialCharTok{{-}}\NormalTok{ predicted\_values)}
+\NormalTok{    best\_predictions }\OtherTok{\textless{}{-}}\NormalTok{ model\_data\_unique[}\FunctionTok{which.min}\NormalTok{(data\_for\_plot}\SpecialCharTok{$}\NormalTok{Error), ]}
+\NormalTok{    best\_predictions}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       env block col row    id y.Trait1 rep gv.Trait1 e.Trait1
+## 78281   9     1   8  21 26085 4.550386   1  3.965561 0.584825
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# add reaction gxe}
+\NormalTok{model2 }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y.Trait1 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ env }\SpecialCharTok{*}\NormalTok{ gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1 }\SpecialCharTok{+}\NormalTok{ block }\SpecialCharTok{+}\NormalTok{ col }\SpecialCharTok{+}\NormalTok{ row }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{id), }\AttributeTok{data =}\NormalTok{ model\_data\_unique)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## fixed-effect model matrix is rank deficient so dropping 3 columns / coefficients
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \CommentTok{\# 计算预测值}
+\NormalTok{    predictions2 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model2, }\AttributeTok{re.form =} \ConstantTok{NULL}\NormalTok{)}
+    
+    \CommentTok{\# 将预测值添加到数据框}
+\NormalTok{    model\_data\_unique}\SpecialCharTok{$}\NormalTok{Predicted2 }\OtherTok{\textless{}{-}}\NormalTok{ predictions2}
+    
+    \CommentTok{\# 使用ggplot2可视化交互作用}
+    \FunctionTok{ggplot}\NormalTok{(model\_data\_unique, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ env, }\AttributeTok{y =}\NormalTok{ Predicted2, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1))) }\SpecialCharTok{+}
+      \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{group =}\NormalTok{ gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1)) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Predicted Trait Values across Environments by Genotype"}\NormalTok{,}
+           \AttributeTok{x =} \StringTok{"Environment"}\NormalTok{,}
+           \AttributeTok{y =} \StringTok{"Predicted Trait Value"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# spatial self{-}relativity}
+\NormalTok{model3 }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y.Trait1 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ env }\SpecialCharTok{+}\NormalTok{ block }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{row) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{col) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{id) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1), }\AttributeTok{data =}\NormalTok{ model\_data\_unique)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## boundary (singular) fit: see help('isSingular')
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \CommentTok{\# 提取随机效应}
+\NormalTok{    random\_effects3\_row }\OtherTok{\textless{}{-}} \FunctionTok{ranef}\NormalTok{(model3)}\SpecialCharTok{$}\NormalTok{row}
+\NormalTok{    random\_effects3\_col }\OtherTok{\textless{}{-}} \FunctionTok{ranef}\NormalTok{(model3)}\SpecialCharTok{$}\NormalTok{col}
+  
+    \CommentTok{\# 转换行号为数值类型}
+\NormalTok{    random\_effects3\_row}\SpecialCharTok{$}\NormalTok{row\_number }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(random\_effects3\_row))}
+\NormalTok{    random\_effects3\_col}\SpecialCharTok{$}\NormalTok{col\_number }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(random\_effects3\_col))}
+    
+    \CommentTok{\# 绘制行和列的随机效应}
+    \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{as.data.frame}\NormalTok{(random\_effects3\_row), }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ random\_effects3\_row}\SpecialCharTok{$}\NormalTok{row\_number, }\AttributeTok{y =}\NormalTok{ random\_effects3\_row}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{(Intercept)}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Random Effects for Rows"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Row"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Effect"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{as.data.frame}\NormalTok{(random\_effects3\_col), }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ random\_effects3\_col}\SpecialCharTok{$}\NormalTok{col\_number, }\AttributeTok{y =}\NormalTok{ random\_effects3\_col}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{(Intercept)}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Random Effects for Columns"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Column"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Effect"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-6-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# random effect among blocks}
+\NormalTok{model4 }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y.Trait1 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ env }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{block) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{col) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{row) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{id) }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{gv\_df}\SpecialCharTok{$}\NormalTok{gv.Trait1), }\AttributeTok{data =}\NormalTok{ model\_data\_unique)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## boundary (singular) fit: see help('isSingular')
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \CommentTok{\# 提取区块的随机效应}
+\NormalTok{    random\_effects4\_block }\OtherTok{\textless{}{-}} \FunctionTok{ranef}\NormalTok{(model4)}\SpecialCharTok{$}\NormalTok{block}
+    
+    \CommentTok{\# 绘制区块的随机效应}
+    \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{as.data.frame}\NormalTok{(random\_effects4\_block), }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{rownames}\NormalTok{(random\_effects4\_block), }\AttributeTok{y =}\NormalTok{ random\_effects4\_block}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{(Intercept)}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Random Effects for Blocks"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Block"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Effect"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{blup_01_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\end{document}

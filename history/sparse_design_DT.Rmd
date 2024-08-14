@@ -1,0 +1,105 @@
+# Replication = 1
+```{r}
+library(FieldSimR)
+library(AlphaSimR)
+library(ggplot2)
+
+# 清空工作环境
+rm(list = ls())
+
+# Params
+nGenos <- c(1000, 500, 250)[1]
+nEnvs <- c(1, 2, 4)[1]
+nFounders <- 20
+nChr <- 21
+nSegSites <- 300
+mu <- 4
+sigma2 <- 0.2
+H2 <- 0.3
+sigma2e <- sigma2 / H2 - sigma2
+
+# Founders
+founders <- runMacs(nInd = nFounders, nChr = nChr, segSites = nSegSites, inbred = TRUE, species = "WHEAT", nThreads = 2)
+
+# Sim Params
+SP <- SimParam$new(founders)
+SP$addTraitA(nQtlPerChr = nSegSites, mean = mu, var = sigma2)
+founders <- newPop(founders)
+
+# F1 genos & DHs
+f1s <- randCross(pop = founders, nCrosses = 40, nProgeny = 25)
+DHs <- makeDH(pop = f1s, nDH = 1)
+```
+
+```{r}
+# Iterate over each environment configuration
+nenvs <- 1
+error_df <- list()
+for (reps in 1:10) { # reps <- 1
+  # Count rows and columns for each env
+  print(reps)
+  total_plots <- 2000 / nenvs
+  ncols <- 40
+  (nrows <- ceiling(total_plots/ncols))
+  
+  # field_trial_error parameters
+  error_df[[reps]] <- field_trial_error(
+    ntraits = 1,
+    nenvs = nenvs,
+    nblocks = 2,
+    block.dir = "col",
+    ncols = ncols,
+    nrows = nrows,
+    varR = sigma2e,
+    spatial.model = "AR1",
+    col.cor = 0.5,
+    row.cor = 0.7,
+    prop.spatial = 0.5,
+    return.effects = TRUE
+  )
+
+  # print out
+  cat(sprintf("No. of Envs：%d, Columns：%d, Rows：%d, Total No. of Plots：%d\n", nenvs, nrows, ncols, nrows * ncols))
+}
+error_df
+```
+# Visualise but plot doesn't show up
+# Seems that FieldSimR has its own drawing functions?
+```{r}
+plot_effects(error_df[[1]]$Trait1[error_df[[1]]$Trait1$env == 1,], effect = "e.spat")
+
+# now construct phenotypes...
+for(reps in 1:10){
+gv.df <- data.frame(env = 1,
+                    rep = rep(1:2, each = 1000),
+                    id = DHs@id,
+                    gv.Trait1 = c(DHs@gv))
+pheno_df <- make_phenotypes(gv.df = gv.df,
+                            error.df = error_df,
+                            randomise = TRUE)
+plot_effects(pheno_df, effect = "y.Trait1") # visualise phenotypes
+
+# expected accuracy
+sqrt(sigma2/(sigma2 + sigma2e/2)) # square root of line mean heritability
+# 0.6793662
+cor(with(pheno_df, tapply(y.Trait1, id, mean)),
+    gv.df$gv.Trait1[gv.df$rep == 1])
+# 0.6700964 this is the expected accuracy for design 1
+}
+
+# analyse the data...
+require(asreml)
+asr1 <- asreml(y.Trait1 ~ env,
+               random = ~id + block,
+               residual = ~ dsum(~ar1(col):ar1(row)|env),
+               data = pheno_df)
+# correlate estimated id effects with true id effects
+cor(asr1$coefficients$random[grep("id", rownames(asr1$coefficients$random))],
+    gv.df$gv.Trait1[gv.df$rep == 1])
+# 0.7340728 this is the realised accuracy for design 1, which is a little higher than expected
+# put the above into a loop and run 1000 times, storing the expected and 
+# realised accuracies for all 1000 reps, once we do that we will then 
+# move to the other designs
+```
+
+
