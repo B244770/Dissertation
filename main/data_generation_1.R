@@ -27,7 +27,7 @@ founders <- newPop(founders)
 f1s <- randCross(pop = founders, nCrosses = 250, nProgeny = 60)
 DHs <- makeDH(pop = f1s, nDH = 1)
 
-# 定义场景数和重复数
+# define number of scenarios and replications
 nScenarios <- 52
 nReps <- 10
 

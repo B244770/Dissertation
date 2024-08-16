@@ -1,6 +1,6 @@
 # define object function
 objective_function <- function(design_matrix, rep_matrix) {
-  # 检查是否有超出总体的情况
+  # check if exceed
   col_sums <- colSums(design_matrix * rep_matrix)
   if (any(col_sums != total_per_env)) {
     return(-Inf)
